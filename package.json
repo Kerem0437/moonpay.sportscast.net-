@@ -1,0 +1,29 @@
+{
+  "name": "moonpay.sportscast.net",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@onflow/fcl": "^1.2.0",
+    "@onflow/types": "^1.0.3",
+    "elliptic": "^6.5.4",
+    "mongoose": "^6.5.2",
+    "moongoose": "^0.0.5",
+    "next": "12.2.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "18.7.9",
+    "@types/react": "18.0.17",
+    "@types/react-dom": "18.0.6",
+    "eslint": "8.22.0",
+    "eslint-config-next": "12.2.5",
+    "typescript": "4.7.4"
+  }
+}
