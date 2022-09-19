@@ -17,7 +17,7 @@
 // > node api/src/utils/encrypt.ts value
 // 4. To encrypt value from a command line, from /api/src/utils/
 // > node api/src/utils/encrypt.ts value
-
+//@ts-ignore
 const path = require("path");
 const { KMSClient, EncryptCommand, DecryptCommand } = require("@aws-sdk/client-kms");
 const { fromIni } = require("@aws-sdk/credential-provider-ini");
@@ -53,8 +53,10 @@ if (process.argv[2]?.length) {
 // This is a example how you can decrpyt to test as well
 // const decryptionString = new Uint8Array(env.MINTER_PRIVATE_KEY.split(','))
 
+
 // const command = new DecryptCommand({CiphertextBlob: decryptionString});
 const command = new EncryptCommand({ KeyId, Plaintext: encryptionString });
+//@ts-ignore
 client.send(command, (err, data) => {
   if (err) {
     console.log(err)

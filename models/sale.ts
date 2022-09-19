@@ -1,5 +1,7 @@
 import mongoose, { Schema, model,models  } from 'mongoose';
+//@ts-ignore
 import { Account } from 'next-auth';
+//@ts-ignore
 import { IPotentialSale } from './order';
 
 

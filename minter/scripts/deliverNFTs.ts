@@ -20,10 +20,10 @@ export default async (order:OrderType,account:IAccount) => {
 
     // load the account 
     try{
-        return sportsCastCollectiblesService.transferNfts(account.flowAccount,[order.nftID]);
-        
+        await sportsCastCollectiblesService.transferNfts(account.flowAccount,[order.nftID]);
     }catch(e){
         console.log({e});
         throw e
     }
+    return true
 }

@@ -1,14 +1,14 @@
 //@ts-ignore
-import * as t from "@onflow/types";
+import * as t from '@onflow/types';
 //@ts-ignore
-import * as fcl from "@onflow/fcl";
-import { FlowService } from "./flow";
-import * as fs from "fs";
-import * as path from "path";
-import { NFTs } from "../../models/NFTS";
-import { Series } from "../../models/NFTS";
-import { calcualteNFT_SetDataTokenIDStart } from "../../utils/nft";
-import { AlchemyQueryResult } from "../../flow/scripts/getAccountNfts";
+import * as fcl from '@onflow/fcl';
+import { FlowService } from './flow';
+import * as fs from 'fs';
+import * as path from 'path';
+import { NFTs } from '../../models/NFTS';
+import { Series } from '../../models/NFTS';
+import { calcualteNFT_SetDataTokenIDStart } from '../../utils/nft';
+import { AlchemyQueryResult } from '../../flow/scripts/getAccountNfts';
 
 const nonFungibleTokenPath = '"../../contracts/NonFungibleToken.cdc"';
 const sportsCastsPath = '"../../contracts/SportscastCollectibles.cdc"';
@@ -18,16 +18,13 @@ class SportsCastCollectiblesService {
     private readonly flowService: FlowService,
     private readonly nonFungibleTokenAddress: string,
     private readonly sportsCastsAccount: string
-  ) { }
+  ) {}
 
   getAllSeries() {
     const script = fs
       .readFileSync(
-        path.join(
-          __dirname,
-          `../../flow/cdc_scripts/getAllSeries.cdc`
-        ),
-        "utf8"
+        path.join(__dirname, `../../flow/cdc_scripts/getAllSeries.cdc`),
+        'utf8'
       )
       .replace(
         nonFungibleTokenPath,
@@ -44,11 +41,8 @@ class SportsCastCollectiblesService {
   getAllNFT_DataSets() {
     const script = fs
       .readFileSync(
-        path.join(
-          __dirname,
-          `../../flow/cdc_scripts/getAllNftSets.cdc`
-        ),
-        "utf8"
+        path.join(__dirname, `../../flow/cdc_scripts/getAllNftSets.cdc`),
+        'utf8'
       )
       .replace(
         nonFungibleTokenPath,
@@ -60,7 +54,6 @@ class SportsCastCollectiblesService {
       script,
       args: [],
     });
-
   }
 
   setupAccount = async () => {
@@ -72,7 +65,7 @@ class SportsCastCollectiblesService {
           __dirname,
           `../cadence/transactions/handyItems/setup_account.cdc`
         ),
-        "utf8"
+        'utf8'
       )
       .replace(
         nonFungibleTokenPath,
@@ -98,7 +91,7 @@ class SportsCastCollectiblesService {
           __dirname,
           `../cadence/transactions/handyItems/transfer_handy_item.cdc`
         ),
-        "utf8"
+        'utf8'
       )
       .replace(
         nonFungibleTokenPath,
@@ -122,7 +115,7 @@ class SportsCastCollectiblesService {
           __dirname,
           `../cadence/scripts/handyItems/get_collection_ids.cdc`
         ),
-        "utf8"
+        'utf8'
       )
       .replace(
         nonFungibleTokenPath,
@@ -139,16 +132,12 @@ class SportsCastCollectiblesService {
   createSeries = async (series_id: number) => {
     const authorization = this.flowService.authorizeMinter();
     const series = Series[series_id];
-    if (!series)
-      throw new Error(`No series found for id ${series_id}`);
+    if (!series) throw new Error(`No series found for id ${series_id}`);
 
     const transaction = fs
       .readFileSync(
-        path.join(
-          __dirname,
-          `../../flow/cdc_transactions/createNewSeries.cdc`
-        ),
-        "utf8"
+        path.join(__dirname, `../../flow/cdc_transactions/createNewSeries.cdc`),
+        'utf8'
       )
       .replace(
         nonFungibleTokenPath,
@@ -162,37 +151,34 @@ class SportsCastCollectiblesService {
     const metadata = [];
     for (const key of Object.keys(series.metadata)) {
       metadata.push({
-        "key": key.toString(),
-        "value": series.metadata[key].toString()
+        key: key.toString(),
+        //@ts-ignore
+        value: series.metadata[key].toString(),
       });
     }
 
     return this.flowService.sendTx({
       transaction,
-      args: [fcl.arg(metadata, t.Dictionary({ key: t.String, value: t.String })),],
+      args: [
+        fcl.arg(metadata, t.Dictionary({ key: t.String, value: t.String })),
+      ],
       authorizations: [authorization],
       payer: authorization,
       proposer: authorization,
     });
-  }
+  };
 
   createSet = async (nft_set_id: number) => {
     console.log({ nft_set_id });
     const authorization = this.flowService.authorizeMinter();
-    // get the nft 
+    // get the nft
     const nft = NFTs[nft_set_id];
-    if (!nft)
-      throw new Error(`No nft found for id ${nft_set_id}`);
-
-
+    if (!nft) throw new Error(`No nft found for id ${nft_set_id}`);
 
     const transaction = fs
       .readFileSync(
-        path.join(
-          __dirname,
-          `../../flow/cdc_transactions/createNFTset.cdc`
-        ),
-        "utf8"
+        path.join(__dirname, `../../flow/cdc_transactions/createNFTset.cdc`),
+        'utf8'
       )
       .replace(
         nonFungibleTokenPath,
@@ -203,55 +189,49 @@ class SportsCastCollectiblesService {
     const metadata = [];
     for (const key of Object.keys(nft.metadata)) {
       metadata.push({
-        "key": key.toString(),
-        "value": nft.metadata[key].toString()
+        key: key.toString(),
+        //@ts-ignore
+        value: nft.metadata[key].toString(),
       });
     }
     const ipfsMetadataHashes = [];
     for (const key of Object.keys(nft.ipfsMetadataHashes)) {
       ipfsMetadataHashes.push({
-        "key": key,
-        "value": nft.ipfsMetadataHashes[key].toString()
+        key: key,
+        //@ts-ignore
+        value: nft.ipfsMetadataHashes[key].toString(),
       });
     }
     await this.flowService.sendTx({
       transaction,
-      args: [fcl.arg(Number(nft.series_id), t.UInt32),
-      fcl.arg(Number(nft.quantity), t.UInt32),
-      fcl.arg(ipfsMetadataHashes,
-        t.Dictionary({ key: t.UInt32, value: t.String })
-      ),
-      fcl.arg(metadata,
-        t.Dictionary({ key: t.String, value: t.String })
-      )
+      args: [
+        fcl.arg(Number(nft.series_id), t.UInt32),
+        fcl.arg(Number(nft.quantity), t.UInt32),
+        fcl.arg(
+          ipfsMetadataHashes,
+          t.Dictionary({ key: t.UInt32, value: t.String })
+        ),
+        fcl.arg(metadata, t.Dictionary({ key: t.String, value: t.String })),
       ],
       authorizations: [authorization],
       payer: authorization,
       proposer: authorization,
     });
 
-
-
     return this.batchMintSet(nft_set_id);
-  }
+  };
 
   batchMintSet = async (nft_set_id: number) => {
     console.log({ nft_set_id });
     const authorization = this.flowService.authorizeMinter();
-    // get the nft 
+    // get the nft
     const nft = NFTs[nft_set_id];
-    if (!nft)
-      throw new Error(`No nft found for id ${nft_set_id}`);
-
-
+    if (!nft) throw new Error(`No nft found for id ${nft_set_id}`);
 
     const transaction = fs
       .readFileSync(
-        path.join(
-          __dirname,
-          `../../flow/cdc_transactions/batchMint.cdc`
-        ),
-        "utf8"
+        path.join(__dirname, `../../flow/cdc_transactions/batchMint.cdc`),
+        'utf8'
       )
       .replace(
         nonFungibleTokenPath,
@@ -259,10 +239,7 @@ class SportsCastCollectiblesService {
       )
       .replace(sportsCastsPath, fcl.withPrefix(this.sportsCastsAccount));
 
-
-
-
-    // computer the list of ids that this should take up 
+    // computer the list of ids that this should take up
     const tokenId_start = calcualteNFT_SetDataTokenIDStart(nft_set_id);
     const tokenIds = [];
     for (let i = 0; i < nft.quantity; i++) {
@@ -275,16 +252,16 @@ class SportsCastCollectiblesService {
       tokenIdGroups.push(tokenIds.slice(i, i + 100));
     }
 
-    // for each token group lets mint it 
+    // for each token group lets mint it
     for (const i in tokenIdGroups) {
       const tokenIds = tokenIdGroups[i];
       console.log(`minting group ${i} of ${tokenIdGroups.length}`);
       await this.flowService.sendTx({
         transaction,
-        args: [fcl.arg(Number(nft.series_id), t.UInt32),fcl.arg(Number(nft_set_id), t.UInt32),
-        fcl.arg(tokenIds,
-          t.Array(t.UInt64)
-        ),
+        args: [
+          fcl.arg(Number(nft.series_id), t.UInt32),
+          fcl.arg(Number(nft_set_id), t.UInt32),
+          fcl.arg(tokenIds, t.Array(t.UInt64)),
         ],
         authorizations: [authorization],
         payer: authorization,
@@ -292,118 +269,56 @@ class SportsCastCollectiblesService {
       });
     }
 
-
-
-
     return true;
-  }
+  };
   ownsNFT = async (account: string, tokenId: number) => {
     const script = fs
-    .readFileSync(
-      path.join(
-        __dirname,
-        `../../../../flow/cdc_scripts/getNftFromAccountCollection.cdc`
-      ),
-      "utf8"
-    )
-    .replace(
-      nonFungibleTokenPath,
-      fcl.withPrefix(this.nonFungibleTokenAddress)
-    )
-    .replace(sportsCastsPath, fcl.withPrefix(this.sportsCastsAccount));
-    const nft = this.flowService.executeScript<AlchemyQueryResult|null>({
-      script,
-      args: [fcl.arg(tokenId, t.UInt64),fcl.arg(account, t.Address)],
-    });
-    if(nft == null)
-      return false
-      
-  return true;
-  }
-  transferNfts = async (to: string, tokenIds: number[]) => {
-    console.log({
-      to,
-      tokenIds
-    })
-    const authorization = this.flowService.authorizeMinter();
-
-    const transaction = fs
       .readFileSync(
         path.join(
           __dirname,
-          `../../../../../../../flow/cdc_transactions/transferNFTs.cdc`
+          `../../../../flow/cdc_scripts/getNftFromAccountCollection.cdc`
         ),
-        "utf8"
+        'utf8'
       )
       .replace(
         nonFungibleTokenPath,
         fcl.withPrefix(this.nonFungibleTokenAddress)
       )
       .replace(sportsCastsPath, fcl.withPrefix(this.sportsCastsAccount));
-    console.log({
-      sportsCastsPath,
-      account : fcl.withPrefix(this.sportsCastsAccount)
-    })
+    const nft = this.flowService.executeScript<AlchemyQueryResult | null>({
+      script,
+      args: [fcl.arg(tokenId, t.UInt64), fcl.arg(account, t.Address)],
+    });
+    if (nft == null) return false;
+
+    return true;
+  };
+  transferNfts = async (to: string, tokenIds: number[]) => {
+    const authorization = this.flowService.authorizeMinter();
+
+    const transaction = fs
+      .readFileSync(
+        path.join(
+          __dirname,
+          `../../../../flow/cdc_transactions/transferNFTs.cdc`
+        ),
+        'utf8'
+      )
+      .replace(
+        nonFungibleTokenPath,
+        fcl.withPrefix(this.nonFungibleTokenAddress)
+      )
+      .replace(sportsCastsPath, fcl.withPrefix(this.sportsCastsAccount));
+
     return this.flowService.sendTx({
       transaction,
       //tokenIds: [UInt64],recipient:Address
-      args: [
-        fcl.arg(tokenIds,
-          t.Array(t.UInt64)
-        ),
-        fcl.arg(to, t.Address),
-
-      ],
+      args: [fcl.arg(tokenIds, t.Array(t.UInt64)), fcl.arg(to, t.Address)],
       authorizations: [authorization],
       payer: authorization,
       proposer: authorization,
     });
-  }
-  transferNftsAsync = async (to: string, tokenIds: number[],onComplete:(tx)=>void,onError:(e:any)=>void) => {
-    console.log({
-      to,
-      tokenIds
-    })
-    const authorization = this.flowService.authorizeMinter();
-
-    const transaction = fs
-      .readFileSync(
-        path.join(
-          __dirname,
-          `../../../../../../../flow/cdc_transactions/transferNFTs.cdc`
-        ),
-        "utf8"
-      )
-      .replace(
-        nonFungibleTokenPath,
-        fcl.withPrefix(this.nonFungibleTokenAddress)
-      )
-      .replace(sportsCastsPath, fcl.withPrefix(this.sportsCastsAccount));
-    console.log({
-      sportsCastsPath,
-      account : fcl.withPrefix(this.sportsCastsAccount)
-    })
-    return this.flowService.sendTxAsync({
-      transaction,
-      //tokenIds: [UInt64],recipient:Address
-      args: [
-        fcl.arg(tokenIds,
-          t.Array(t.UInt64)
-        ),
-        fcl.arg(to, t.Address),
-
-      ],
-      authorizations: [authorization],
-      payer: authorization,
-      proposer: authorization,
-      callback: (tx) => {
-        onComplete(tx);
-      },
-      error: (err) => {
-        onError(err);
-      }
-    });
-  }
+  };
 }
 
 export { SportsCastCollectiblesService };

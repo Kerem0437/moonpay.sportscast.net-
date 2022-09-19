@@ -4,7 +4,9 @@ import connectDB from '../../../../../middleware/mongodb';
 import { NFTs, Series } from '../../../../../models/NFTS';
 import Orders, { OrderStatus } from '../../../../../models/order';
 import Accounts from '../../../../../models/account';
-import deliverNFT from '../../../../../minter/scripts/deliverNftViaMoonPay';
+//@ts-ignore
+//import deliverNFT from '../../../../../minter/scripts/deliverNftViaMoonPay';
+import deliverNFT from '../../../../../minter/scripts/deliverNFTs';
 type Data = {
     transactionID: string;
 }
@@ -70,6 +72,7 @@ async function handler(
 
 
     res.status(200).json({ 
+        //@ts-ignore
         transactionID: transactionId
     });
 }

@@ -58,11 +58,13 @@ export const getRandomBites = async (setId:number,n:number) =>{
   const orders = await Orders.find({
       $or:[ 
         {
+          //@ts-ignore
           editionID : { "$in" : [...set.nftsInPack]},
           status: {
               $in: [OrderStatus.PAYMENT_RECEIVED,OrderStatus.NFT_DELIVERED]
           }
         }, {
+          //@ts-ignore
           editionID : { "$in" : [...set.nftsInPack]},
           expirationDate: {
               $gte: new Date()

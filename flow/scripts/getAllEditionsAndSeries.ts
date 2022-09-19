@@ -1,6 +1,18 @@
-import {transaction, limit, proposer,payer, authorizations, authz, cdc,currentUser} from "@onflow/fcl"
-import {invariant} from "@onflow/util-invariant"
-import {tx} from "../tx"
+//@ts-ignore
+import {
+  transaction,
+  limit,
+  proposer,
+  payer,
+  authorizations,
+  authz,
+  cdc,
+  currentUser,
+  //@ts-ignore
+} from '@onflow/fcl';
+//@ts-ignore
+import { invariant } from '@onflow/util-invariant';
+import { tx } from '../tx';
 
 const CODE = cdc`
 import NonFungibleToken from 0xNonFungibleToken
@@ -30,22 +42,30 @@ pub fun main(): [UInt64] {
     // return them 
     return seriesIds;
 }
-`
+`;
 
-export async function getAllEditionsAndSeries(address:string) {
-    // prettier-ignore
-    const user = await (await currentUser().authenticate());
-    
-    invariant(user.addr != null, "Tried to initialize an account but no address was supplied")
-  
-    return tx(
-      [
-        transaction(CODE),
-        limit(70),
-        proposer(authz),
-        payer(authz),
-        authorizations([authz]),
-      ],
-      {}
-    )
-  }
+export async function getAllEditionsAndSeries(address: string) {
+  // prettier-ignore
+  const user = await (await currentUser().authenticate());
+
+  invariant(
+    user.addr != null,
+    'Tried to initialize an account but no address was supplied'
+  );
+
+  return tx(
+    [
+      //@ts-ignore
+      transaction(CODE),
+      //@ts-ignore
+      limit(70),
+      //@ts-ignore
+      proposer(authz),
+      //@ts-ignore
+      payer(authz),
+      //@ts-ignore
+      authorizations([authz]),
+    ],
+    {}
+  );
+}
